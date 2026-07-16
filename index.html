@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextLens — AI vs Human Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+ 
+<div class="page">
+ 
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">⬡</span>
+            <span class="logo-text">TextLens</span>
+        </div>
+        <div class="header-tag">GRU · BiDirectional · 99.6% val accuracy</div>
+    </header>
+ 
+    <!-- Hero -->
+    <section class="hero">
+        <p class="eyebrow">Deep learning text analysis</p>
+        <h1 class="hero-title">
+            Was this written<br>by a <span class="accent-ai">machine</span>
+            or a <span class="accent-human">human</span>?
+        </h1>
+        <p class="hero-sub">
+            Paste any text below. Our Bidirectional GRU model analyses vocabulary,
+            sentence structure, and stylistic patterns to determine authorship.
+        </p>
+    </section>
+ 
+    <!-- Main card -->
+    <main class="card">
+ 
+        <form method="POST" id="detector-form">
+ 
+            <div class="textarea-wrapper">
+                <textarea
+                    name="text"
+                    id="text-input"
+                    rows="10"
+                    placeholder="Paste your text here — at least a sentence or two works best..."
+                    required>{{ request.form.get('text', '') }}</textarea>
+                <div class="char-count" id="char-count">0 characters</div>
+            </div>
+ 
+            <button type="submit" id="submit-btn">
+                <span class="btn-text">Analyse Text</span>
+                <span class="btn-icon">→</span>
+            </button>
+ 
+        </form>
+ 
+        {% if result %}
+ 
+        <div class="result" id="result">
+ 
+            <!-- Verdict -->
+            <div class="verdict-row">
+                <div class="verdict-label">Verdict</div>
+                <div class="verdict-badge {% if result.prediction == 'AI Generated' %}verdict-ai{% else %}verdict-human{% endif %}">
+                    {% if result.prediction == 'AI Generated' %}
+                        ⚡ AI Generated
+                    {% else %}
+                        ✦ Human Written
+                    {% endif %}
+                </div>
+                <div class="confidence-pill">{{ result.level }} confidence · {{ result.confidence }}%</div>
+            </div>
+ 
+            <!-- Split meter — signature element -->
+            <div class="meter-section">
+                <div class="meter-labels">
+                    <span class="meter-label-ai">AI {{ result.ai_prob }}%</span>
+                    <span class="meter-divider">|</span>
+                    <span class="meter-label-human">{{ result.human_prob }}% Human</span>
+                </div>
+                <div class="split-meter">
+                    <div class="meter-ai" style="width: {{ result.ai_prob }}%;"></div>
+                    <div class="meter-center"></div>
+                    <div class="meter-human" style="width: {{ result.human_prob }}%;"></div>
+                </div>
+                <div class="meter-ends">
+                    <span>100% AI</span>
+                    <span>100% Human</span>
+                </div>
+            </div>
+ 
+            <!-- Stats row -->
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-value ai-color">{{ result.ai_prob }}%</div>
+                    <div class="stat-label">AI Probability</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <div class="stat-value human-color">{{ result.human_prob }}%</div>
+                    <div class="stat-label">Human Probability</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <div class="stat-value">{{ result.confidence }}%</div>
+                    <div class="stat-label">Confidence</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <div class="stat-value">{{ result.level }}</div>
+                    <div class="stat-label">Confidence Level</div>
+                </div>
+            </div>
+ 
+        </div>
+ 
+        {% endif %}
+ 
+    </main>
+ 
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Trained on 487K texts · Bidirectional GRU · Built with TensorFlow & Flask</p>
+    </footer>
+ 
+</div>
+ 
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
